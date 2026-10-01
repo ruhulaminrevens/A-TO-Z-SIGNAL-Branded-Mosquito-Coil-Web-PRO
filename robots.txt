@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /database/
+Disallow: /uploads/admin/
+Disallow: /*?*utm_
+Disallow: /*?*fbclid=
+Disallow: /*?*gclid=
+
+Sitemap: https://atoz.nabiad.com/sitemap.xml

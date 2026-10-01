@@ -1,0 +1,78 @@
+Options -Indexes
+DirectoryIndex index.php
+ErrorDocument 404 /404.php
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Enforce HTTPS in production, including sites behind a trusted hosting proxy.
+RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
+
+# Consolidate duplicate legacy page URLs into one crawlable URL.
+RewriteCond %{THE_REQUEST} \s/+index\.php(?:[?\s]) [NC]
+RewriteRule ^index\.php$ ./ [R=301,L,NE]
+RewriteCond %{THE_REQUEST} \s/+blog\.php(?:[?\s]) [NC]
+RewriteRule ^blog\.php$ blogs [R=301,L,NE]
+RewriteCond %{THE_REQUEST} \s/+about-us\.php(?:[?\s]) [NC]
+RewriteRule ^about-us\.php$ about [R=301,L,NE]
+RewriteCond %{THE_REQUEST} \s/+privacy-policy\.php(?:[?\s]) [NC]
+RewriteRule ^privacy-policy\.php$ privacy-policy [R=301,L,NE]
+RewriteCond %{THE_REQUEST} \s/+terms-conditions\.php(?:[?\s]) [NC]
+RewriteRule ^terms-conditions\.php$ terms-conditions [R=301,L,NE]
+
+# Block internal application folders from direct web access.
+RewriteRule ^(config|includes|database)/ - [F,L]
+
+# v42 SEO-friendly public routes. Old PHP URLs still work, but crawlers see cleaner canonical URLs.
+RewriteCond %{QUERY_STRING} (^|&)slug=([^&]+) [NC]
+RewriteRule ^product-details\.php$ product/%2? [R=301,L,NE]
+RewriteCond %{QUERY_STRING} (^|&)slug=([^&]+) [NC]
+RewriteRule ^blog-details\.php$ blog/%2? [R=301,L,NE]
+
+RewriteRule ^product/([A-Za-z0-9\-]+)/?$ product-details.php?slug=$1 [L,QSA,B]
+RewriteRule ^blog/([A-Za-z0-9\-]+)/?$ blog-details.php?slug=$1 [L,QSA,B]
+RewriteRule ^blogs/?$ blog.php [L,QSA]
+RewriteRule ^about/?$ about-us.php [L,QSA]
+RewriteRule ^privacy-policy/?$ privacy-policy.php [L,QSA]
+RewriteRule ^terms-conditions/?$ terms-conditions.php [L,QSA]
+RewriteRule ^catalogue/?$ catalogue-download.php [L,QSA]
+RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
+RewriteRule ^robots\.txt$ robots.php [L,QSA]
+</IfModule>
+
+<FilesMatch "\.(env|ini|log|sql|bak|json)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 30 days"
+    ExpiresByType application/javascript "access plus 30 days"
+    ExpiresByType image/png "access plus 90 days"
+    ExpiresByType image/jpeg "access plus 90 days"
+    ExpiresByType image/webp "access plus 180 days"
+    ExpiresByType image/svg+xml "access plus 180 days"
+    ExpiresByType image/x-icon "access plus 180 days"
+    ExpiresByType font/woff2 "access plus 180 days"
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|png|jpe?g|webp|svg|ico|woff2)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
+</IfModule>

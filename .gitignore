@@ -1,0 +1,22 @@
+# Operating-system and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local environment and generated secrets
+.env
+.env.*
+config/database.local.php
+*.log
+*.bak
+
+# Local backups and temporary exports
+backups/
+tmp/
+cache/
+atoz-signal-operational-backup-*.json
+
+# User-uploaded admin/profile content should be backed up separately
+uploads/admin/*
+!uploads/admin/.htaccess
